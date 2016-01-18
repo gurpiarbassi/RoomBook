@@ -14,6 +14,8 @@ import java.util.TreeSet;
 
 import com.gurps.roombooking.domain.BookingRequest;
 import com.gurps.roombooking.domain.BookingRequestBatch;
+import com.gurps.roombooking.domain.IBookingRequest;
+import com.gurps.roombooking.domain.IBookingRequestBatch;
 
 /**
  * Processes the given input schedule to produce an output schedule
@@ -24,12 +26,12 @@ import com.gurps.roombooking.domain.BookingRequestBatch;
  */
 public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
 
-    private String inputFilePath;
-    private String outputFilePath;
+    private final String inputFilePath;
+    private final String outputFilePath;
 
     
-    private ScheduleCalculatorService scheduleOutputService;
-    private SchedulePrinterService printerService;
+    private final ScheduleCalculatorService scheduleOutputService;
+    private final SchedulePrinterService printerService;
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final DateTimeFormatter REQ_TIME_FMT = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -46,7 +48,7 @@ public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
      * @param inputFilePath the input file path
      * @param outputFilePath the output file path
      */
-    public MeetingSchedulerServiceImpl(String inputFilePath, String outputFilePath) {
+    public MeetingSchedulerServiceImpl(final String inputFilePath, final String outputFilePath) {
         this.inputFilePath = inputFilePath;
         this.outputFilePath = outputFilePath;
         
@@ -66,14 +68,14 @@ public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
     public void produceSchedule() {
         System.out.println("Scheduling...");
         try {
-            BookingRequestBatch batch = this.readInputFile();
-            Map<LocalDate, SortedSet<BookingRequest>> output = this.scheduleOutputService.calculate(batch);
+            final IBookingRequestBatch batch = this.readInputFile();
+            final Map<LocalDate, SortedSet<IBookingRequest>> output = this.scheduleOutputService.calculate(batch);
             this.printerService.print(output); //print the output
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
             try {
                 this.writeError();
-            } catch (Exception e2) {
+            } catch (final Exception e2) {
                 e2.printStackTrace();
                 System.err.println("Unable to write error to file");
             }
@@ -100,10 +102,10 @@ public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
      * @return a booking request batch or null if nothing to book
      * @throws IOException
      */
-    private BookingRequestBatch readInputFile() throws IOException {
+    private IBookingRequestBatch readInputFile() throws IOException {
 
-        SortedSet<BookingRequest> bookingRequests = new TreeSet<>();
-        BookingRequestBatch batch = null;
+        final SortedSet<BookingRequest> bookingRequests = new TreeSet<>();
+        IBookingRequestBatch batch = null;
         
         try (Scanner scanner = new Scanner(Paths.get(this.inputFilePath), Charset.defaultCharset()
                 .name())) {
@@ -112,9 +114,8 @@ public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
                 batch = this.createBatch(scanner.nextLine());
                 
                 while (scanner.hasNextLine()) {
-                    bookingRequests.add(parseRequest(scanner.nextLine(), scanner.nextLine()));
+                	batch.addBookingRequest(parseRequest(scanner.nextLine(), scanner.nextLine()));
                 }
-                batch.setBookingRequests(bookingRequests);
             }
             return batch;
         }
@@ -126,17 +127,16 @@ public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
      * @return BookingRequestBatch (a sort of parent object that encapsulates all the bookings)
      */
     private BookingRequestBatch createBatch(final String line) {
-        String[] hours = line.split(IN_FILE_DELIM);
-        LocalTime openingTime = LocalTime.parse(hours[0], COMPANY_HOURS_FMT);
-        LocalTime closingTime = LocalTime.parse(hours[1], COMPANY_HOURS_FMT);
-        BookingRequestBatch batch = new BookingRequestBatch(openingTime, closingTime);
-        return batch;
+        final String[] hours = line.split(IN_FILE_DELIM);
+        final LocalTime openingTime = LocalTime.parse(hours[0], COMPANY_HOURS_FMT);
+        final LocalTime closingTime = LocalTime.parse(hours[1], COMPANY_HOURS_FMT);
+        return new BookingRequestBatch(openingTime, closingTime);
     }
 
-    private BookingRequest parseRequest(final String firstLine, final String secondLine) {
+    private IBookingRequest parseRequest(final String firstLine, final String secondLine) {
 
-        String[] firstLineTokens = firstLine.split(IN_FILE_DELIM);
-        String[] secondLineTokens = secondLine.split(IN_FILE_DELIM);
+        final String[] firstLineTokens = firstLine.split(IN_FILE_DELIM);
+        final String[] secondLineTokens = secondLine.split(IN_FILE_DELIM);
 
         if (firstLineTokens == null || firstLineTokens.length != 3) {
             throw new IllegalArgumentException(
@@ -146,27 +146,27 @@ public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
                     " Line must contain meeting date, start time and duration");
         }
 
-        LocalDate submissionDate = LocalDate.parse(firstLineTokens[0], DATE_FMT);
-        LocalTime submissionTime = LocalTime.parse(firstLineTokens[1], REQ_TIME_FMT);
-        String employeeNumber = firstLineTokens[2];
+        final LocalDate submissionDate = LocalDate.parse(firstLineTokens[0], DATE_FMT);
+        final LocalTime submissionTime = LocalTime.parse(firstLineTokens[1], REQ_TIME_FMT);
+        final String employeeNumber = firstLineTokens[2];
         
         if(employeeNumber == null || employeeNumber.length() == 0){
             throw new IllegalArgumentException("employee number not specified");
         }
         
-        LocalDate meetingDate = LocalDate.parse(secondLineTokens[0], DATE_FMT);
-        LocalTime meetingStartTime = LocalTime.parse(secondLineTokens[1], START_TIME_FMT);
+        final LocalDate meetingDate = LocalDate.parse(secondLineTokens[0], DATE_FMT);
+        final LocalTime meetingStartTime = LocalTime.parse(secondLineTokens[1], START_TIME_FMT);
         
-        int duration = Integer.parseInt(secondLineTokens[2]); 
+        final int duration = Integer.parseInt(secondLineTokens[2]); 
         
         if(Math.signum(duration) <= 0){
             throw new IllegalArgumentException(
                     " Duration must be a positive integer");
         }
 
-        BookingRequest bookingRequest = new BookingRequest.BookingRequestBuilder(submissionDate,
-                submissionTime).meetingDate(meetingDate).meetingStart(meetingStartTime)
-                .duration(duration).employee(employeeNumber).build();
+        final IBookingRequest bookingRequest =  BookingRequest.BookingRequestBuilder.aBookingRequest(submissionDate,
+                submissionTime).withMeetingDate(meetingDate).withMeetingStartTime(meetingStartTime)
+                .withMeetingDuration(duration).withEmployee(employeeNumber).build();
 
         return bookingRequest;
     }

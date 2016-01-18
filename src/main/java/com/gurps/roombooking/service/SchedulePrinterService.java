@@ -5,9 +5,9 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.SortedSet;
 
-import com.gurps.roombooking.domain.BookingRequest;
+import com.gurps.roombooking.domain.IBookingRequest;
 
 public interface SchedulePrinterService {
 
-    void print(Map<LocalDate, SortedSet<BookingRequest>> output) throws IOException;
+    void print(final Map<LocalDate, SortedSet<IBookingRequest>> output) throws IOException;
 }

@@ -7,8 +7,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import com.gurps.roombooking.domain.BookingRequest;
-import com.gurps.roombooking.domain.BookingRequestBatch;
+import com.gurps.roombooking.domain.IBookingRequest;
+import com.gurps.roombooking.domain.IBookingRequestBatch;
 import com.gurps.roombooking.domain.ScheduledMeetingComparator;
 
 /**
@@ -27,22 +27,22 @@ public class BasicCalculatorService implements ScheduleCalculatorService{
      * Any booking requests that break the business ruling will not be calculated and will be skipped
      * e.g. if a meeting clashes with another one then the one that was submitted first takes precedence.
      */
-    public Map<LocalDate, SortedSet<BookingRequest>> calculate(final BookingRequestBatch batch) {
+    public Map<LocalDate, SortedSet<IBookingRequest>> calculate(final IBookingRequestBatch batch) {
         
         System.out.println("....calculating output ....");
         
-        Map<LocalDate, SortedSet<BookingRequest>> meetingsSchedule = new TreeMap<>();
+        final Map<LocalDate, SortedSet<IBookingRequest>> meetingsSchedule = new TreeMap<>();
         if(batch != null){
-            for(BookingRequest booking : batch.getBookingRequests()){
+            for(final IBookingRequest booking : batch.getBookingRequests()){
                 if(isOutsideOfficeHours(booking, batch.getOpeningTime(), batch.getClosingTime())){
                     System.out.println("Meeting occurs outside office hours. Req =  " 
                             + booking.getRequestDate() + " " + booking.getRequestTime());
                 }else{
                     
-                    LocalDate meetingDate = booking.getMeetingDate();
-                    SortedSet<BookingRequest> meetings = meetingsSchedule.get(meetingDate);
+                    final LocalDate meetingDate = booking.getMeetingDate();
+                    SortedSet<IBookingRequest> meetings = meetingsSchedule.get(meetingDate);
                     if(meetings == null){
-                        meetings = new TreeSet<>(new ScheduledMeetingComparator());
+                        meetings = new TreeSet<IBookingRequest>(new ScheduledMeetingComparator());
                         meetingsSchedule.put(meetingDate, meetings);
                     }
                     
@@ -65,7 +65,7 @@ public class BasicCalculatorService implements ScheduleCalculatorService{
      * @param booking The Booking Request
      * @return true if the booking falls outside the company office hours. False otherwise
      */
-    private boolean isOutsideOfficeHours(final BookingRequest booking, final LocalTime openingTime,
+    private boolean isOutsideOfficeHours(final IBookingRequest booking, final LocalTime openingTime,
             final LocalTime closingTime){
         return booking.getMeetingStartTime().isBefore(openingTime) ||
                booking.getMeetingStartTime().isAfter(closingTime) ||

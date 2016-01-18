@@ -9,7 +9,7 @@ import java.util.Comparator;
  * @author Gurps Bassi gurpiar.bassi@gmail.com
  *
  */
-public class ScheduledMeetingComparator implements Comparator<BookingRequest> {
+public class ScheduledMeetingComparator implements Comparator<IBookingRequest> {
     
     @Override
     
@@ -21,7 +21,7 @@ public class ScheduledMeetingComparator implements Comparator<BookingRequest> {
      * (non-Javadoc)
      * @see java.util.Comparator#compare(java.lang.Object, java.lang.Object)
      */
-    public int compare(final BookingRequest first, final BookingRequest second) {
+    public int compare(final IBookingRequest first, final IBookingRequest second) {
 
         // start by comparing the meeting date
         int result = first.getMeetingDate().compareTo(second.getMeetingDate());
@@ -50,9 +50,9 @@ public class ScheduledMeetingComparator implements Comparator<BookingRequest> {
      * @param second The second booking request
      * @return true if the meetings clash, false otherwise.
      */
-    private boolean overlaps(final BookingRequest first, final BookingRequest second) {
+    private boolean overlaps(final IBookingRequest first, final IBookingRequest second) {
         
-        boolean clash = first.getMeetingStartTime().isBefore(second.getMeetingEndDateTime().toLocalTime())
+        final boolean clash = first.getMeetingStartTime().isBefore(second.getMeetingEndDateTime().toLocalTime())
         && second.getMeetingStartTime().isBefore(first.getMeetingEndDateTime().toLocalTime());
         
         return clash;

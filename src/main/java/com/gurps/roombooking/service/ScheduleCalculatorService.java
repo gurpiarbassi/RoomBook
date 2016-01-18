@@ -4,12 +4,12 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.SortedSet;
 
-import com.gurps.roombooking.domain.BookingRequest;
-import com.gurps.roombooking.domain.BookingRequestBatch;
+import com.gurps.roombooking.domain.IBookingRequest;
+import com.gurps.roombooking.domain.IBookingRequestBatch;
 
 public interface ScheduleCalculatorService {
     
     static final String OUT_FILE_DELIM = " ";
 
-    Map<LocalDate, SortedSet<BookingRequest>> calculate(BookingRequestBatch batch);
+    Map<LocalDate, SortedSet<IBookingRequest>> calculate(final IBookingRequestBatch batch);
 }

@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 
-import com.gurps.roombooking.domain.BookingRequest;
+import com.gurps.roombooking.domain.IBookingRequest;
 
 /**
  * File specific output service outputs to a given file path
@@ -19,11 +19,11 @@ import com.gurps.roombooking.domain.BookingRequest;
  */
 public class FilePrinterServiceImpl implements SchedulePrinterService{
 
-    private String outputFilePath;
+    private final String outputFilePath;
     
     private static final String OUT_FILE_DELIM = " ";
     
-    public FilePrinterServiceImpl(String outputFilePath){
+    public FilePrinterServiceImpl(final String outputFilePath){
      this.outputFilePath = outputFilePath;
     }
     
@@ -32,18 +32,18 @@ public class FilePrinterServiceImpl implements SchedulePrinterService{
      * @Param bookings All the successful booking requests
      * Formats the bookings and prints to a file. 
      */
-    public void print(Map<LocalDate, SortedSet<BookingRequest>> bookings) throws IOException {
-        StringBuilder outputBuilder = new StringBuilder();
-        Set<Entry<LocalDate, SortedSet<BookingRequest>>> entries = bookings.entrySet();
-        Iterator<Entry<LocalDate, SortedSet<BookingRequest>>> meetingDaysIterator = entries.iterator();
+    public void print(final Map<LocalDate, SortedSet<IBookingRequest>> bookings) throws IOException {
+        final StringBuilder outputBuilder = new StringBuilder();
+        final Set<Entry<LocalDate, SortedSet<IBookingRequest>>> entries = bookings.entrySet();
+        final Iterator<Entry<LocalDate, SortedSet<IBookingRequest>>> meetingDaysIterator = entries.iterator();
         while(meetingDaysIterator.hasNext()){
-            Entry<LocalDate, SortedSet<BookingRequest>> entry = meetingDaysIterator.next();
-            LocalDate meetingDate = entry.getKey();
+            final Entry<LocalDate, SortedSet<IBookingRequest>> entry = meetingDaysIterator.next();
+            final LocalDate meetingDate = entry.getKey();
             outputBuilder.append(meetingDate.toString() + System.getProperty("line.separator"));
             
-            Iterator<BookingRequest> it = entry.getValue().iterator();
+            final Iterator<IBookingRequest> it = entry.getValue().iterator();
             while(it.hasNext()){
-                BookingRequest bookingRequest = it.next();
+                final IBookingRequest bookingRequest = it.next();
                 outputBuilder.append(bookingRequest.getMeetingStartTime())
                               .append(OUT_FILE_DELIM)
                               .append(bookingRequest.getMeetingEndDateTime().toLocalTime())

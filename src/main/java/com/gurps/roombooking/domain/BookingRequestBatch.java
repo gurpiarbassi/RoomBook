@@ -1,52 +1,66 @@
 package com.gurps.roombooking.domain;
 
+import static java.util.Collections.unmodifiableSet;
+import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
+import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
+import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
+import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
+
 import java.time.LocalTime;
 import java.util.Set;
-
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
+import java.util.TreeSet;
 
 /**
- * A Booking request batch consists of a header i.e. the opening and closing time
- * followed by a Set of booking requests.
  * 
  * @author Gurps Bassi gurpiar.bassi@gmail.com
  *
  */
-public class BookingRequestBatch {
+public final class BookingRequestBatch implements IBookingRequestBatch {
 
-    private LocalTime openingTime;
-    private LocalTime closingTime;
-    
-    private Set<BookingRequest> bookingRequests;
-    
-    public BookingRequestBatch(LocalTime openingTime, LocalTime closingTime){
-        this.openingTime = openingTime;
-        this.closingTime = closingTime;
-    }
-    
-    public LocalTime getOpeningTime() {
-        return openingTime;
-    }
+	private final LocalTime openingTime;
+	private final LocalTime closingTime;
 
+	private final Set<IBookingRequest> bookingRequests;
 
-    public LocalTime getClosingTime() {
-        return closingTime;
-    }
+	public BookingRequestBatch(final LocalTime openingTime, final LocalTime closingTime) {
+		this.openingTime = openingTime;
+		this.closingTime = closingTime;
+		this.bookingRequests = new TreeSet<>();
+	}
 
+	@Override
+	public LocalTime getOpeningTime() {
+		return openingTime;
+	}
 
-    public Set<BookingRequest> getBookingRequests() {
-        return bookingRequests;
-    }
+	@Override
+	public LocalTime getClosingTime() {
+		return closingTime;
+	}
+	
+	@Override
+	public boolean addBookingRequest(final IBookingRequest bookingRequest){
+		return bookingRequests.add(bookingRequest);
+	}
 
-    public void setBookingRequests(Set<BookingRequest> bookingRequests) {
-        this.bookingRequests = bookingRequests;
-    }
+	@Override
+	public Set<IBookingRequest> getBookingRequests() {
+		return unmodifiableSet(this.bookingRequests);
+	}
 
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this,
-                ToStringStyle.MULTI_LINE_STYLE);
-    }
+	@Override
+	public String toString() {
+		return reflectionToString(this, MULTI_LINE_STYLE);
+	}
+
+	@Override
+	public int hashCode() {
+		return reflectionHashCode(this);
+	}
+
+	@Override
+	public boolean equals(final Object that) {
+		return reflectionEquals(this, that);
+	}
 
 }
