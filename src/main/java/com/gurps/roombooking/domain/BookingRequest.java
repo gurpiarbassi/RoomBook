@@ -32,7 +32,7 @@ public class BookingRequest implements Comparable<BookingRequest> {
      */    
     private LocalDateTime meetingEndDateTime;
 
-    private BookingRequest(BookingRequestBuilder builder) {
+    private BookingRequest(final BookingRequestBuilder builder) {
 	this.requestDate = builder.requestDate;
 	this.requestTime = builder.requestTime;
 	this.employeeId = builder.employeeId;
@@ -126,8 +126,6 @@ public class BookingRequest implements Comparable<BookingRequest> {
      * 
      * Note: The meeting end time will be automatically computed by the builder.
      * 
-     * @author Gurps Bassi gurpiar.bassi@gmail.com
-     *
      */
     public static class BookingRequestBuilder {
 	private final LocalDate requestDate;
