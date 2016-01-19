@@ -3,17 +3,16 @@ package com.gurps.roombooking.domain;
 import static java.time.temporal.ChronoUnit.HOURS;
 import static org.apache.commons.lang3.Validate.notEmpty;
 import static org.apache.commons.lang3.Validate.notNull;
+import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
+import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.temporal.ChronoUnit;
 
 import org.apache.commons.lang3.builder.CompareToBuilder;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class BookingRequest implements Comparable<BookingRequest>, IBookingRequest {
 
@@ -29,7 +28,7 @@ public class BookingRequest implements Comparable<BookingRequest>, IBookingReque
 	 * Assuming meetings can go into the next day if company hours permit we
 	 * need to model the meeting end time as a date/time.
 	 */
-	private LocalDateTime meetingEndDateTime;
+	private final LocalDateTime meetingEndDateTime;
 
 	private BookingRequest(final BookingRequestBuilder builder) {
 		this.requestDate = builder.requestDate;
@@ -68,8 +67,6 @@ public class BookingRequest implements Comparable<BookingRequest>, IBookingReque
 
 	@Override
 	public LocalDateTime getMeetingEndDateTime() {
-		final LocalDateTime start = LocalDateTime.of(meetingDate, meetingStartTime);
-		this.meetingEndDateTime = start.plus(meetingDuration, ChronoUnit.HOURS);
 		return meetingEndDateTime;
 	}
 
@@ -79,23 +76,13 @@ public class BookingRequest implements Comparable<BookingRequest>, IBookingReque
 	}
 
 	@Override
-	public boolean equals(final Object obj) {
-		if (obj == null) {
-			return false;
-		}
-		if (obj == this) {
-			return true;
-		}
-		if (obj.getClass() != getClass()) {
-			return false;
-		}
-		final IBookingRequest rhs = (IBookingRequest) obj;
-		return new EqualsBuilder().appendSuper(super.equals(obj)).append(getRequestDate(), rhs.getRequestDate()).append(getRequestTime(), rhs.getRequestTime()).isEquals();
+	public boolean equals(final Object that) {
+		return reflectionEquals(this, that);
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(getRequestDate()).append(getRequestTime()).toHashCode();
+		return reflectionHashCode(this);
 	}
 
 	@Override
@@ -103,19 +90,23 @@ public class BookingRequest implements Comparable<BookingRequest>, IBookingReque
 		return reflectionToString(this, MULTI_LINE_STYLE);
 	}
 
-	@Override
+	
 	/**
 	 * Constraint: 'Bookings must be processed in the chronological order in which they were submitted'.
 	 * Default to ordering the bookings by request submission date/time
 	 * @param that BookingRequest to compare.
 	 * @return 
-	 *  0 if the booking requests were submitted at the same time (Although business rules gurantee this wont happen)
+	 *  0 if the booking requests were submitted at the same time (Although business rules guarantee this wont happen)
 	 *  1 if this booking request was submitted after that booking request
 	 *  -1 if this booking request was submitted before that booking request
 	 * 
 	 */
+	@Override
 	public int compareTo(final BookingRequest that) {
+		return compareByRequestDateTime(that);
+	}
 
+	private int compareByRequestDateTime(final BookingRequest that) {
 		return new CompareToBuilder().append(this.getRequestDate(), that.getRequestDate()).append(this.getRequestTime(), that.getRequestTime()).toComparison();
 	}
 
@@ -135,7 +126,7 @@ public class BookingRequest implements Comparable<BookingRequest>, IBookingReque
 		private LocalTime meetingStartTime;
 		private LocalDateTime meetingEndDateTime;
 
-		private int meetingDuration;
+		private Integer meetingDuration;
 
 		private BookingRequestBuilder(final LocalDate requestDate, final LocalTime requestTime) {
 			this.requestDate = requestDate;
@@ -161,7 +152,7 @@ public class BookingRequest implements Comparable<BookingRequest>, IBookingReque
 			return this;
 		}
 
-		public BookingRequestBuilder withMeetingDuration(final int duration) {
+		public BookingRequestBuilder withMeetingDuration(final Integer duration) {
 			this.meetingDuration = duration;
 			return this;
 		}

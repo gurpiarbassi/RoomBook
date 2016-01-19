@@ -31,12 +31,12 @@ public class TestFilePrinterService {
     @Test
      public void testPrintOfEmptyDataSet(){
         final Map<LocalDate, SortedSet<IBookingRequest>> output = new TreeMap<>();
-        final SchedulePrinterService printer = new FilePrinterServiceImpl(getHomeDir() + File.separator + " output.txt");
+        final SchedulePrinterService printer = new FilePrinterServiceImpl(Paths.get(getHomeDir(), "output.txt"));
         try{
             printer.print(output);
             
             //check file is empty
-            assertEquals(0, Files.size(Paths.get(getHomeDir() + File.separator + " output.txt")));
+            assertEquals(0, Files.size(Paths.get(getHomeDir(), "output.txt")));
         }catch(final IOException e){
             e.printStackTrace();
             fail("Exception caught. Test failed!");
@@ -75,7 +75,7 @@ public class TestFilePrinterService {
         output.put(LocalDate.of(2011, 3, 21), set1);
         output.put(LocalDate.of(2011, 3, 22), set2);
         
-        final SchedulePrinterService printer = new FilePrinterServiceImpl(getHomeDir() + File.separator + " output.txt");
+        final SchedulePrinterService printer = new FilePrinterServiceImpl(Paths.get(getHomeDir(), "output.txt"));
         try{
             printer.print(output);            
             //check file is populated
@@ -83,7 +83,7 @@ public class TestFilePrinterService {
             
             
             //read contents of file and compare with expected output;
-            final List<String> allLines = Files.readAllLines(Paths.get(getHomeDir() + File.separator + " output.txt"), Charset.defaultCharset());
+            final List<String> allLines = Files.readAllLines(Paths.get(getHomeDir(), "output.txt"), Charset.defaultCharset());
             assertEquals(5, allLines.size());
             assertEquals("2011-03-21", allLines.get(0));
             assertEquals("09:00 11:00 EMP002", allLines.get(1));

@@ -37,7 +37,6 @@ public class TestBasicCalculatorService {
         //TODO factory for service classes or DI.
         
         final ScheduleCalculatorService calcService = new BasicCalculatorService();
-        final Set<IBookingRequest> bookings = new TreeSet<>();
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest);
         

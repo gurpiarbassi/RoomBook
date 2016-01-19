@@ -23,12 +23,17 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			<!-- <plugin> <groupId>org.apache.maven.plugins</groupId> <artifactId>maven-jar-plugin</artifactId> 
-				<configuration> <archive> <manifest> <addClasspath>true</addClasspath> <mainClass>com.akqa.MeetingScheduler</mainClass> 
-				</manifest> </archive> </configuration> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
 				<configuration>
 					<archive>
 						<manifest>
@@ -46,14 +51,16 @@
 			</plugin>
 		</plugins>
 	</build>
+
 	<dependencies>
 
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
+			<scope>compile</scope>
 		</dependency>
-		
+
 
 		<dependency>
 			<groupId>junit</groupId>

@@ -3,14 +3,13 @@ package com.gurps.roombooking.service;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.SortedSet;
-import java.util.TreeSet;
 
 import com.gurps.roombooking.domain.BookingRequest;
 import com.gurps.roombooking.domain.BookingRequestBatch;
@@ -26,8 +25,8 @@ import com.gurps.roombooking.domain.IBookingRequestBatch;
  */
 public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
 
-    private final String inputFilePath;
-    private final String outputFilePath;
+    private final Path inputFilePath;
+    private final Path outputFilePath;
 
     
     private final ScheduleCalculatorService scheduleOutputService;
@@ -48,7 +47,7 @@ public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
      * @param inputFilePath the input file path
      * @param outputFilePath the output file path
      */
-    public MeetingSchedulerServiceImpl(final String inputFilePath, final String outputFilePath) {
+    public MeetingSchedulerServiceImpl(final Path inputFilePath, final Path outputFilePath) {
         this.inputFilePath = inputFilePath;
         this.outputFilePath = outputFilePath;
         
@@ -91,7 +90,7 @@ public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
      */
     private void writeError() throws IOException {
         System.out.println("Writing on Error");
-        Files.write(Paths.get(this.outputFilePath), ERROR_TXT.getBytes());
+        Files.write(this.outputFilePath, ERROR_TXT.getBytes());
     }
 
     /**
@@ -104,10 +103,9 @@ public class MeetingSchedulerServiceImpl implements MeetingSchedulerService {
      */
     private IBookingRequestBatch readInputFile() throws IOException {
 
-        final SortedSet<BookingRequest> bookingRequests = new TreeSet<>();
         IBookingRequestBatch batch = null;
         
-        try (Scanner scanner = new Scanner(Paths.get(this.inputFilePath), Charset.defaultCharset()
+        try (Scanner scanner = new Scanner(this.inputFilePath, Charset.defaultCharset()
                 .name())) {
             
             if (scanner.hasNextLine()) {

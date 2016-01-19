@@ -1,13 +1,13 @@
 package com.gurps.roombooking.domain;
 
-import static java.util.Collections.unmodifiableSet;
+import static java.util.Collections.unmodifiableSortedSet;
 import static org.apache.commons.lang3.builder.EqualsBuilder.reflectionEquals;
 import static org.apache.commons.lang3.builder.HashCodeBuilder.reflectionHashCode;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
 import static org.apache.commons.lang3.builder.ToStringStyle.MULTI_LINE_STYLE;
 
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
@@ -20,7 +20,7 @@ public final class BookingRequestBatch implements IBookingRequestBatch {
 	private final LocalTime openingTime;
 	private final LocalTime closingTime;
 
-	private final Set<IBookingRequest> bookingRequests;
+	private final SortedSet<IBookingRequest> bookingRequests;
 
 	public BookingRequestBatch(final LocalTime openingTime, final LocalTime closingTime) {
 		this.openingTime = openingTime;
@@ -44,8 +44,8 @@ public final class BookingRequestBatch implements IBookingRequestBatch {
 	}
 
 	@Override
-	public Set<IBookingRequest> getBookingRequests() {
-		return unmodifiableSet(this.bookingRequests);
+	public SortedSet<IBookingRequest> getBookingRequests() {
+		return unmodifiableSortedSet(this.bookingRequests);
 	}
 
 	@Override

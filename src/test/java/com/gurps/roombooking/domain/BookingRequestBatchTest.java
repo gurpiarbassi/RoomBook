@@ -6,7 +6,7 @@ import static org.junit.Assert.assertSame;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.SortedSet;
 
 import org.junit.Test;
 
@@ -36,9 +36,9 @@ public class BookingRequestBatchTest {
 																								.build();
 		batch.addBookingRequest(bookingRequest);
 		
-		final Set<IBookingRequest> bookingRequests = batch.getBookingRequests();
+		final SortedSet<IBookingRequest> bookingRequests = batch.getBookingRequests();
 		assertEquals(1, bookingRequests.size());
 		assertSame(bookingRequest, bookingRequests.iterator().next());
 	}
-
+	
 }
