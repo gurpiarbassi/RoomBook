@@ -4,11 +4,10 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.fail;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -17,26 +16,35 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import com.gurps.roombooking.domain.BookingRequest;
 import com.gurps.roombooking.domain.IBookingRequest;
 
 public class TestFilePrinterService {
 
-    private String getHomeDir(){
-        return System.getProperty("user.home");
-    }
+	@Rule
+	public final TemporaryFolder tmpFolder = new TemporaryFolder();
+	
+	private Path outputFolder;
+	
+	@Before
+	public void setup() throws IOException{
+		outputFolder = tmpFolder.newFolder().toPath();
+	}
    
     @Test
      public void testPrintOfEmptyDataSet(){
         final Map<LocalDate, SortedSet<IBookingRequest>> output = new TreeMap<>();
-        final SchedulePrinterService printer = new FilePrinterServiceImpl(Paths.get(getHomeDir(), "output.txt"));
+        final SchedulePrinterService printer = new FilePrinterServiceImpl(outputFolder.resolve("output.txt"));
         try{
             printer.print(output);
             
             //check file is empty
-            assertEquals(0, Files.size(Paths.get(getHomeDir(), "output.txt")));
+            assertEquals(0, Files.size(outputFolder.resolve("output.txt")));
         }catch(final IOException e){
             e.printStackTrace();
             fail("Exception caught. Test failed!");
@@ -75,15 +83,15 @@ public class TestFilePrinterService {
         output.put(LocalDate.of(2011, 3, 21), set1);
         output.put(LocalDate.of(2011, 3, 22), set2);
         
-        final SchedulePrinterService printer = new FilePrinterServiceImpl(Paths.get(getHomeDir(), "output.txt"));
+        final SchedulePrinterService printer = new FilePrinterServiceImpl(outputFolder.resolve("output.txt"));
         try{
             printer.print(output);            
             //check file is populated
-            assertNotEquals(0, Files.size(Paths.get(getHomeDir() + File.separator + " output.txt")));
+            assertNotEquals(0, Files.size(outputFolder.resolve("output.txt")));
             
             
             //read contents of file and compare with expected output;
-            final List<String> allLines = Files.readAllLines(Paths.get(getHomeDir(), "output.txt"), Charset.defaultCharset());
+            final List<String> allLines = Files.readAllLines(outputFolder.resolve("output.txt"), Charset.defaultCharset());
             assertEquals(5, allLines.size());
             assertEquals("2011-03-21", allLines.get(0));
             assertEquals("09:00 11:00 EMP002", allLines.get(1));
@@ -101,11 +109,10 @@ public class TestFilePrinterService {
     //TOO Refactor to utility method since can be used by more than one Test class
     private BookingRequest makeBookingRequest(final LocalDate requestDate, final LocalTime requestTime, final LocalDate meetingDate,
             final LocalTime meetingStartTime, final int duration, final String employeeNumber){
-        return  BookingRequest.BookingRequestBuilder.aBookingRequest(requestDate, requestTime)
-        .withMeetingDate(meetingDate)
-        .withMeetingStartTime(meetingStartTime)
-        .withMeetingDuration(duration)
-        .withEmployee(employeeNumber)
-        .build();
+        return  BookingRequest.BookingRequestBuilder.aBookingRequest(requestDate, requestTime).withMeetingDate(meetingDate)
+																						       .withMeetingStartTime(meetingStartTime)
+																						       .withMeetingDuration(duration)
+																						       .withEmployee(employeeNumber)
+																						       .build();
     }
 }
