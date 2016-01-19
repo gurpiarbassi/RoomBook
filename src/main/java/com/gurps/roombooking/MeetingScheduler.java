@@ -1,12 +1,10 @@
 package com.gurps.roombooking;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.InvalidPathException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
+import com.gurps.roombooking.service.IMeetingSchedulerService;
 import com.gurps.roombooking.service.MeetingSchedulerService;
-import com.gurps.roombooking.service.MeetingSchedulerServiceImpl;
 
 /**
  * 
@@ -17,30 +15,38 @@ import com.gurps.roombooking.service.MeetingSchedulerServiceImpl;
  */
 public class MeetingScheduler {
 
-    private static MeetingSchedulerService meetingSchedulerService;
+    private final IMeetingSchedulerService meetingSchedulerService;
 
+    public MeetingScheduler(final IMeetingSchedulerService meetingSchedulerService){
+		this.meetingSchedulerService = meetingSchedulerService;
+    }
+    
+    public void run(){
+    	 meetingSchedulerService.produceSchedule();
+    }
+    
     public static void main(final String[] args) throws IOException {
         if (args.length != 2) {
             throw new IllegalArgumentException("input path and output path should be specified.");
         } 
         
-         Path inputFilePath = null;
-         Path outputFilePath = null;
+          File inputFile = null;
+          File outputFile = null;
         	
         	try{
-        		 inputFilePath = Paths.get(args[0]);
-                 outputFilePath = Paths.get(args[1]);
-                 System.out.println("input path : " + inputFilePath);
-                 System.out.println("output path : " + outputFilePath);
-        	}catch(final InvalidPathException e){
+        		 inputFile = new File(args[0]);
+                 outputFile = new File(args[1]);
+                 System.out.println("input file : " + inputFile);
+                 System.out.println("output file : " + outputFile);
+                 if(!inputFile.exists()){
+                	 throw new IOException("Input file " + inputFile + " does not exist");
+                 }
+        	}catch(final Exception e){
         		throw new IOException(e);
         	}
         	
-            // TODO use DI to shield concrete implementation from client
-            meetingSchedulerService = new MeetingSchedulerServiceImpl(inputFilePath, outputFilePath);
-
-            meetingSchedulerService.produceSchedule();
-
+        	final MeetingScheduler meetingScheduler = new MeetingScheduler(new MeetingSchedulerService(inputFile, outputFile));
+        	meetingScheduler.run();
 
     }
 }

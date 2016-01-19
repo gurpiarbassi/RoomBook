@@ -3,8 +3,8 @@ package com.gurps.roombooking.service;
 import static java.nio.file.Files.createDirectories;
 import static java.nio.file.Files.write;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,12 +21,12 @@ import com.gurps.roombooking.domain.IBookingRequest;
  */
 public class FilePrinterServiceImpl implements SchedulePrinterService{
 
-    private final Path outputFilePath;
+    private final File outputFile;
     
     private static final String OUT_FILE_DELIM = " ";
     
-    public FilePrinterServiceImpl(final Path outputFilePath){
-     this.outputFilePath = outputFilePath;
+    public FilePrinterServiceImpl(final File outputFile){
+     this.outputFile = outputFile;
     }
     
     @Override
@@ -59,8 +59,8 @@ public class FilePrinterServiceImpl implements SchedulePrinterService{
                 outputBuilder.append(System.getProperty("line.separator"));
             }
         }
-        createDirectories(outputFilePath.getParent()); //create directory structure if not already present
-        write(outputFilePath, outputBuilder.toString().getBytes());
+        createDirectories(outputFile.toPath().getParent()); //create directory structure if not already present
+        write(outputFile.toPath(), outputBuilder.toString().getBytes());
     }
 
 }
