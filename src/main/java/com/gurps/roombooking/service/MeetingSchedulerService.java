@@ -20,6 +20,7 @@ import com.gurps.roombooking.domain.BookingRequest;
 import com.gurps.roombooking.domain.BookingRequestBatch;
 import com.gurps.roombooking.domain.IBookingRequest;
 import com.gurps.roombooking.domain.IBookingRequestBatch;
+import com.gurps.roombooking.domain.IBookingRequestScheduler;
 
 /**
  * Processes the given input schedule to produce an output schedule

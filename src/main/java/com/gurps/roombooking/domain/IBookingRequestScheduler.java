@@ -1,11 +1,8 @@
-package com.gurps.roombooking.service;
+package com.gurps.roombooking.domain;
 
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.SortedSet;
-
-import com.gurps.roombooking.domain.IBookingRequest;
-import com.gurps.roombooking.domain.IBookingRequestBatch;
 
 public interface IBookingRequestScheduler {
     

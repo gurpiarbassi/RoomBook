@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gurps.roombooking.service.BookingRequestScheduler;
+import com.gurps.roombooking.domain.BookingRequestScheduler;
 import com.gurps.roombooking.service.IMeetingSchedulerService;
 import com.gurps.roombooking.service.MeetingSchedulerService;
 

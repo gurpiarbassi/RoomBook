@@ -1,4 +1,4 @@
-package com.gurps.roombooking.service;
+package com.gurps.roombooking.domain;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -9,10 +9,6 @@ import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.gurps.roombooking.domain.IBookingRequest;
-import com.gurps.roombooking.domain.IBookingRequestBatch;
-import com.gurps.roombooking.domain.ScheduledMeetingComparator;
 
 /**
  * The key business rules are defined in this class.

@@ -14,7 +14,9 @@ import org.junit.Test;
 
 import com.gurps.roombooking.domain.BookingRequest;
 import com.gurps.roombooking.domain.BookingRequestBatch;
+import com.gurps.roombooking.domain.BookingRequestScheduler;
 import com.gurps.roombooking.domain.IBookingRequest;
+import com.gurps.roombooking.domain.IBookingRequestScheduler;
 
 /**
  * 
