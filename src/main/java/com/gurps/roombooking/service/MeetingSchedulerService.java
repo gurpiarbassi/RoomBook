@@ -13,6 +13,9 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.gurps.roombooking.domain.BookingRequest;
 import com.gurps.roombooking.domain.BookingRequestBatch;
 import com.gurps.roombooking.domain.IBookingRequest;
@@ -29,9 +32,7 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
 
     private final Reader reader;
     private final Writer writer;
-
-    
-    private final IBookingRequestCalculator bookingRequestCalculator;
+    private final IBookingRequestScheduler bookingRequestScheduler;
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final DateTimeFormatter REQ_TIME_FMT = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -41,13 +42,15 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
     private static final String IN_FILE_DELIM = " ";
     private static final String OUT_FILE_DELIM = " ";
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeetingSchedulerService.class);
+    
     
     private static final String ERROR_TXT = "INVALID INPUT";
 
-    public MeetingSchedulerService(final Reader reader, final Writer writer, final IBookingRequestCalculator bookingRequestCalculator) {
+    public MeetingSchedulerService(final Reader reader, final Writer writer, final IBookingRequestScheduler bookingRequestCalculator) {
         this.reader = reader;
         this.writer = writer;
-        this.bookingRequestCalculator = bookingRequestCalculator; 
+        this.bookingRequestScheduler = bookingRequestCalculator; 
     }
 
     /**
@@ -59,10 +62,10 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
      */
     @Override
     public void produceSchedule() {
-        System.out.println("Scheduling...");
+       LOGGER.info("Scheduling...");
         try {
             final IBookingRequestBatch batch = this.readInputFile();
-            final Map<LocalDate, SortedSet<IBookingRequest>> output = bookingRequestCalculator.calculate(batch);
+            final Map<LocalDate, SortedSet<IBookingRequest>> output = bookingRequestScheduler.calculate(batch);
             print(output); //print the output
         } catch (final IOException e) {
             e.printStackTrace();
@@ -70,7 +73,7 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
                 this.writeError();
             } catch (final Exception e2) {
                 e2.printStackTrace();
-                System.err.println("Unable to write error to file");
+                LOGGER.error("Unable to write error to file");
             }
 
         }
@@ -83,7 +86,7 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
      * @throws IOException thrown when writing an error to the output file.
      */
     private void writeError() throws IOException {
-        System.out.println("Writing on Error");
+    	LOGGER.error("Writing on Error");
         writer.write(ERROR_TXT);
     }
 

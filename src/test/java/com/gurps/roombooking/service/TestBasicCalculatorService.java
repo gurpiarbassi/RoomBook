@@ -36,7 +36,7 @@ public class TestBasicCalculatorService {
         
         //TODO factory for service classes or DI.
         
-        final IBookingRequestCalculator calcService = new BookingRequestCalculator();
+        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest);
         
@@ -56,7 +56,7 @@ public class TestBasicCalculatorService {
         
         //TODO factory for service classes or DI.
         
-        final IBookingRequestCalculator calcService = new BookingRequestCalculator();
+        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest);
         final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.calculate(batch);
@@ -74,7 +74,7 @@ public class TestBasicCalculatorService {
         
         //TODO factory for service classes or DI.
         
-        final IBookingRequestCalculator calcService = new BookingRequestCalculator();
+        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
         final Set<BookingRequest> bookings = new TreeSet<>();
         bookings.add(bookingRequest);
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
@@ -94,7 +94,7 @@ public class TestBasicCalculatorService {
         
         //TODO factory for service classes or DI.
         
-        final IBookingRequestCalculator calcService = new BookingRequestCalculator();
+        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
         final Set<BookingRequest> bookings = new TreeSet<>();
         bookings.add(bookingRequest);
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
@@ -120,7 +120,7 @@ public class TestBasicCalculatorService {
                 "EMP02");
         
         
-        final IBookingRequestCalculator calcService = new BookingRequestCalculator();
+        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest1);
         batch.addBookingRequest(bookingRequest2);
@@ -159,7 +159,7 @@ public class TestBasicCalculatorService {
                 1,
                 "EMP01");
         
-        final IBookingRequestCalculator calcService = new BookingRequestCalculator();
+        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
         
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest1);
@@ -205,7 +205,7 @@ public class TestBasicCalculatorService {
                 1,
                 "EMP02");
         
-        final IBookingRequestCalculator calcService = new BookingRequestCalculator();
+        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
         
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest1);
@@ -250,7 +250,7 @@ public class TestBasicCalculatorService {
         final BookingRequest bookingRequest5 = makeBookingRequest(LocalDate.of(2011, 3, 15), LocalTime.of(17, 29, 12),
                 LocalDate.of(2011, 3, 21), LocalTime.of(16, 0), 3,"EMP005");
         
-        final IBookingRequestCalculator calcService = new BookingRequestCalculator();
+        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
         
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 30));
         batch.addBookingRequest(bookingRequest1);

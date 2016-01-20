@@ -8,7 +8,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.gurps.roombooking.service.BookingRequestCalculator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.gurps.roombooking.service.BookingRequestScheduler;
 import com.gurps.roombooking.service.IMeetingSchedulerService;
 import com.gurps.roombooking.service.MeetingSchedulerService;
 
@@ -21,6 +24,8 @@ import com.gurps.roombooking.service.MeetingSchedulerService;
  */
 public class MeetingScheduler {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(MeetingScheduler.class);
+	
     private final IMeetingSchedulerService meetingSchedulerService;
 
     public MeetingScheduler(final IMeetingSchedulerService meetingSchedulerService){
@@ -42,8 +47,8 @@ public class MeetingScheduler {
         	try{
         		 inputFilePath = Paths.get(args[0]);
         		 outputFilePath = Paths.get(args[1]);
-                 System.out.println("input file : " + inputFilePath);
-                 System.out.println("output file : " + outputFilePath);
+                 LOGGER.info("input file : {}",  inputFilePath);
+                 LOGGER.info("output file : {} ", outputFilePath);
                  if(notExists(inputFilePath)){
                 	 throw new IOException("Input file " + inputFilePath + " does not exist");
                  }
@@ -54,7 +59,7 @@ public class MeetingScheduler {
         	//TODO put behind factory
         	final MeetingScheduler meetingScheduler = new MeetingScheduler(new MeetingSchedulerService(newBufferedReader(inputFilePath),
         																   newBufferedWriter(outputFilePath),
-        																   new BookingRequestCalculator()));
+        																   new BookingRequestScheduler()));
         	meetingScheduler.run();
 
     }
