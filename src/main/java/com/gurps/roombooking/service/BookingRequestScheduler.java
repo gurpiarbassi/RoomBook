@@ -7,6 +7,9 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.gurps.roombooking.domain.IBookingRequest;
 import com.gurps.roombooking.domain.IBookingRequestBatch;
 import com.gurps.roombooking.domain.ScheduledMeetingComparator;
@@ -19,7 +22,9 @@ import com.gurps.roombooking.domain.ScheduledMeetingComparator;
  */
 public class BookingRequestScheduler implements IBookingRequestScheduler {
 
-	@Override
+	private static final Logger LOGGER = LoggerFactory.getLogger(BookingRequestScheduler.class);
+	
+	
 	/**
 	 * @param batch the BookingRequestBatch consisting of individual submissions
 	 * @return Map consisting of meeting date against a set of BookingRequests in chronological order
@@ -27,9 +32,10 @@ public class BookingRequestScheduler implements IBookingRequestScheduler {
 	 * Any booking requests that break the business ruling will not be calculated and will be skipped
 	 * e.g. if a meeting clashes with another one then the one that was submitted first takes precedence.
 	 */
+	@Override
 	public Map<LocalDate, SortedSet<IBookingRequest>> calculate(final IBookingRequestBatch batch) {
 
-		System.out.println("....calculating output ....");
+		LOGGER.info("....calculating output ....");
 
 		final Map<LocalDate, SortedSet<IBookingRequest>> meetingsSchedule = new TreeMap<>();
 		if (batch != null) {
@@ -46,7 +52,7 @@ public class BookingRequestScheduler implements IBookingRequestScheduler {
 					}
 
 					if (!meetings.add(booking)) {
-						System.out.println("Conflicting booking found for " + booking.getRequestDate() + " " + booking.getRequestTime());
+						LOGGER.warn("Conflicting booking found for " + booking.getRequestDate() + " " + booking.getRequestTime());
 					}
 				}
 			}

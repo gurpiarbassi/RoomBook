@@ -55,7 +55,7 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
 
     /**
      * Processes the input file and produce and domain representation of the
-     * meeting request submisson batch.
+     * meeting request submission batch.
      * 
      * If any error occurs parsing the input file such as field formatting we treat
      * the whole input file as a bad file. In this case we write the constant MeetingScheduler.ERROR_TXT to the output file.
@@ -68,14 +68,21 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
             final Map<LocalDate, SortedSet<IBookingRequest>> output = bookingRequestScheduler.calculate(batch);
             print(output); //print the output
         } catch (final IOException e) {
-            e.printStackTrace();
+        	LOGGER.error("Error processing schedule ", e);
             try {
                 this.writeError();
-            } catch (final Exception e2) {
-                e2.printStackTrace();
-                LOGGER.error("Unable to write error to file");
+            } catch (final IOException e2) {
+                LOGGER.error("Unable to write error to file", e2);
             }
 
+        }finally{
+        	try{
+        		reader.close();
+            	writer.close();
+        	}catch (final IOException e) {
+            	LOGGER.error("Error closing readers and writers ", e);
+        	}
+        	
         }
 
     }
