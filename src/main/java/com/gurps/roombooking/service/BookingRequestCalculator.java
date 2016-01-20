@@ -17,7 +17,7 @@ import com.gurps.roombooking.domain.ScheduledMeetingComparator;
  * @author Gurps Bassi  gurpiar.bassi@gmail.com
  *
  */
-public class BasicCalculatorService implements ScheduleCalculatorService{
+public class BookingRequestCalculator implements IBookingRequestCalculator{
 
     @Override
     /**

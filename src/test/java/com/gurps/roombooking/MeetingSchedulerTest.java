@@ -21,6 +21,11 @@ public class MeetingSchedulerTest {
 		MeetingScheduler.main(new String[]{"foo", "bar"});
 	}
 	
+	@Test(expected=IllegalArgumentException.class)
+	public void testMissingArgumentsHandled() throws IOException {
+		MeetingScheduler.main(new String[]{});
+	}
+	
 	@Test
 	public void testHappyPath() throws IOException {
 		final IMeetingSchedulerService meetingSchedulerService = mock(IMeetingSchedulerService.class);

@@ -1,15 +1,16 @@
 package com.gurps.roombooking.service;
 
-import static java.nio.file.Files.write;
-
-import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
+import java.io.Reader;
+import java.io.Writer;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.SortedSet;
 
 import com.gurps.roombooking.domain.BookingRequest;
@@ -26,12 +27,11 @@ import com.gurps.roombooking.domain.IBookingRequestBatch;
  */
 public class MeetingSchedulerService implements IMeetingSchedulerService {
 
-    private final File inputFile;
-    private final File outputFile;
+    private final Reader reader;
+    private final Writer writer;
 
     
-    private final ScheduleCalculatorService scheduleOutputService;
-    private final SchedulePrinterService printerService;
+    private final IBookingRequestCalculator bookingRequestCalculator;
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ISO_LOCAL_DATE;
     private static final DateTimeFormatter REQ_TIME_FMT = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -39,22 +39,15 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
     private static final DateTimeFormatter COMPANY_HOURS_FMT = DateTimeFormatter.ofPattern("HHmm");
 
     private static final String IN_FILE_DELIM = " ";
+    private static final String OUT_FILE_DELIM = " ";
     
     
     private static final String ERROR_TXT = "INVALID INPUT";
 
-    /**
-     * Makes use of two child services - namely the ScheduleCalculatorService and SchedulePrinterService
-     * @param inputFilePath the input file path
-     * @param outputFilePath the output file path
-     */
-    public MeetingSchedulerService(final File inputFile, final File outputFile) {
-        this.inputFile = inputFile;
-        this.outputFile = outputFile;
-        
-        //TODO use DI to shield concrete implementation from client to allow future flexiblity in scheduling & printing rules
-        this.scheduleOutputService = new BasicCalculatorService(); 
-        this.printerService = new FilePrinterServiceImpl(outputFile);
+    public MeetingSchedulerService(final Reader reader, final Writer writer, final IBookingRequestCalculator bookingRequestCalculator) {
+        this.reader = reader;
+        this.writer = writer;
+        this.bookingRequestCalculator = bookingRequestCalculator; 
     }
 
     /**
@@ -69,8 +62,8 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
         System.out.println("Scheduling...");
         try {
             final IBookingRequestBatch batch = this.readInputFile();
-            final Map<LocalDate, SortedSet<IBookingRequest>> output = this.scheduleOutputService.calculate(batch);
-            this.printerService.print(output); //print the output
+            final Map<LocalDate, SortedSet<IBookingRequest>> output = bookingRequestCalculator.calculate(batch);
+            print(output); //print the output
         } catch (final IOException e) {
             e.printStackTrace();
             try {
@@ -91,7 +84,7 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
      */
     private void writeError() throws IOException {
         System.out.println("Writing on Error");
-        write(this.outputFile.toPath(), ERROR_TXT.getBytes());
+        writer.write(ERROR_TXT);
     }
 
     /**
@@ -105,9 +98,8 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
     private IBookingRequestBatch readInputFile() throws IOException {
 
         IBookingRequestBatch batch = null;
-        
-        try (Scanner scanner = new Scanner(this.inputFile, Charset.defaultCharset()
-                .name())) {
+
+        try (Scanner scanner = new Scanner(reader)) {
             
             if (scanner.hasNextLine()) {
                 batch = this.createBatch(scanner.nextLine());
@@ -169,4 +161,41 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
 
         return bookingRequest;
     }
+    
+
+    
+   
+    
+    /**
+     * @Param bookings All the successful booking requests
+     * Formats the bookings and prints to a file. 
+     */
+    public void print(final Map<LocalDate, SortedSet<IBookingRequest>> bookings) throws IOException {
+        final StringBuilder outputBuilder = new StringBuilder();
+        final Set<Entry<LocalDate, SortedSet<IBookingRequest>>> entries = bookings.entrySet();
+        final Iterator<Entry<LocalDate, SortedSet<IBookingRequest>>> meetingDaysIterator = entries.iterator();
+        while(meetingDaysIterator.hasNext()){
+            final Entry<LocalDate, SortedSet<IBookingRequest>> entry = meetingDaysIterator.next();
+            final LocalDate meetingDate = entry.getKey();
+            outputBuilder.append(meetingDate.toString() + System.getProperty("line.separator"));
+            
+            final Iterator<IBookingRequest> it = entry.getValue().iterator();
+            while(it.hasNext()){
+                final IBookingRequest bookingRequest = it.next();
+                outputBuilder.append(bookingRequest.getMeetingStartTime())
+                              .append(OUT_FILE_DELIM)
+                              .append(bookingRequest.getMeetingEndDateTime().toLocalTime())
+                              .append(OUT_FILE_DELIM)
+                              .append(bookingRequest.getEmployeeId());
+                if(it.hasNext()){
+                    outputBuilder.append(System.getProperty("line.separator"));
+                }
+            }
+            if(meetingDaysIterator.hasNext()){
+                outputBuilder.append(System.getProperty("line.separator"));
+            }
+        }
+        writer.write(outputBuilder.toString());
+    }
+
 }

@@ -1,8 +1,14 @@
 package com.gurps.roombooking;
 
-import java.io.File;
-import java.io.IOException;
+import static java.nio.file.Files.newBufferedReader;
+import static java.nio.file.Files.newBufferedWriter;
+import static java.nio.file.Files.notExists;
 
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import com.gurps.roombooking.service.BookingRequestCalculator;
 import com.gurps.roombooking.service.IMeetingSchedulerService;
 import com.gurps.roombooking.service.MeetingSchedulerService;
 
@@ -30,22 +36,25 @@ public class MeetingScheduler {
             throw new IllegalArgumentException("input path and output path should be specified.");
         } 
         
-          File inputFile = null;
-          File outputFile = null;
+          Path inputFilePath = null;
+          Path outputFilePath = null;
         	
         	try{
-        		 inputFile = new File(args[0]);
-                 outputFile = new File(args[1]);
-                 System.out.println("input file : " + inputFile);
-                 System.out.println("output file : " + outputFile);
-                 if(!inputFile.exists()){
-                	 throw new IOException("Input file " + inputFile + " does not exist");
+        		 inputFilePath = Paths.get(args[0]);
+        		 outputFilePath = Paths.get(args[1]);
+                 System.out.println("input file : " + inputFilePath);
+                 System.out.println("output file : " + outputFilePath);
+                 if(notExists(inputFilePath)){
+                	 throw new IOException("Input file " + inputFilePath + " does not exist");
                  }
         	}catch(final Exception e){
         		throw new IOException(e);
         	}
         	
-        	final MeetingScheduler meetingScheduler = new MeetingScheduler(new MeetingSchedulerService(inputFile, outputFile));
+        	//TODO put behind factory
+        	final MeetingScheduler meetingScheduler = new MeetingScheduler(new MeetingSchedulerService(newBufferedReader(inputFilePath),
+        																   newBufferedWriter(outputFilePath),
+        																   new BookingRequestCalculator()));
         	meetingScheduler.run();
 
     }

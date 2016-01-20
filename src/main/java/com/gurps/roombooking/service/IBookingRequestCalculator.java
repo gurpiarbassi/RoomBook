@@ -7,7 +7,7 @@ import java.util.SortedSet;
 import com.gurps.roombooking.domain.IBookingRequest;
 import com.gurps.roombooking.domain.IBookingRequestBatch;
 
-public interface ScheduleCalculatorService {
+public interface IBookingRequestCalculator {
     
     static final String OUT_FILE_DELIM = " ";
 
