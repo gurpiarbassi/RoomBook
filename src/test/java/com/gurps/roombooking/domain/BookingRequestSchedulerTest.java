@@ -53,5 +53,82 @@ public class BookingRequestSchedulerTest {
 		final Map<LocalDate, SortedSet<IBookingRequest>> calculatedSchedule = bookingRequestScheduler.schedule(batch);
 		assertEquals(0, calculatedSchedule.size());
 	}
+	
+	@Test
+	public void ignoresMeetingStartingBeforeOfficeOpening(){
+		final LocalDate meetingDate = LocalDate.of(2011, 10, 25);
+		
+		final BookingRequest bookingRequest1 = aBookingRequest(LocalDate.of(2011, 10, 12), LocalTime.of(1, 33))
+				.withEmployee("abc")
+				.withMeetingDate(meetingDate)
+			    .withMeetingDuration(1)
+			    .withMeetingStartTime(LocalTime.of(9, 50))
+			    .build();
 
+		final BookingRequest bookingRequest2 = aBookingRequest(LocalDate.of(2011, 10, 12), LocalTime.of(1, 34))
+				.withEmployee("abc")
+				.withMeetingDate(meetingDate)
+				.withMeetingDuration(1)
+				.withMeetingStartTime(LocalTime.of(13, 50))
+				.build();
+		
+		final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(10, 0), LocalTime.of(17, 0));
+		batch.addBookingRequest(bookingRequest1);
+		batch.addBookingRequest(bookingRequest2);
+		final Map<LocalDate, SortedSet<IBookingRequest>> calculatedSchedule = bookingRequestScheduler.schedule(batch);
+		assertEquals(1, calculatedSchedule.size());
+		assertEquals(1, calculatedSchedule.get(meetingDate).size());
+	}
+	
+	@Test
+	public void ignoresMeetingStartingAfterClosing(){
+		final LocalDate meetingDate = LocalDate.of(2011, 10, 25);
+		
+		final BookingRequest bookingRequest1 = aBookingRequest(LocalDate.of(2011, 10, 12), LocalTime.of(1, 33))
+				.withEmployee("abc")
+				.withMeetingDate(meetingDate)
+			    .withMeetingDuration(1)
+			    .withMeetingStartTime(LocalTime.of(17, 1))
+			    .build();
+
+		final BookingRequest bookingRequest2 = aBookingRequest(LocalDate.of(2011, 10, 12), LocalTime.of(1, 34))
+				.withEmployee("abc")
+				.withMeetingDate(meetingDate)
+				.withMeetingDuration(1)
+				.withMeetingStartTime(LocalTime.of(13, 50))
+				.build();
+		
+		final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(10, 0), LocalTime.of(17, 0));
+		batch.addBookingRequest(bookingRequest1);
+		batch.addBookingRequest(bookingRequest2);
+		final Map<LocalDate, SortedSet<IBookingRequest>> calculatedSchedule = bookingRequestScheduler.schedule(batch);
+		assertEquals(1, calculatedSchedule.size());
+		assertEquals(1, calculatedSchedule.get(meetingDate).size());
+	}
+	
+	@Test
+	public void ignoresMeetingEndTimeAfterClosing(){
+		final LocalDate meetingDate = LocalDate.of(2011, 10, 25);
+		
+		final BookingRequest bookingRequest1 = aBookingRequest(LocalDate.of(2011, 10, 12), LocalTime.of(1, 33))
+				.withEmployee("abc")
+				.withMeetingDate(meetingDate)
+			    .withMeetingDuration(5)
+			    .withMeetingStartTime(LocalTime.of(16, 1))
+			    .build();
+
+		final BookingRequest bookingRequest2 = aBookingRequest(LocalDate.of(2011, 10, 12), LocalTime.of(1, 34))
+				.withEmployee("abc")
+				.withMeetingDate(meetingDate)
+				.withMeetingDuration(1)
+				.withMeetingStartTime(LocalTime.of(13, 50))
+				.build();
+		
+		final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(10, 0), LocalTime.of(17, 0));
+		batch.addBookingRequest(bookingRequest1);
+		batch.addBookingRequest(bookingRequest2);
+		final Map<LocalDate, SortedSet<IBookingRequest>> calculatedSchedule = bookingRequestScheduler.schedule(batch);
+		assertEquals(1, calculatedSchedule.size());
+		assertEquals(1, calculatedSchedule.get(meetingDate).size());
+	}
 }

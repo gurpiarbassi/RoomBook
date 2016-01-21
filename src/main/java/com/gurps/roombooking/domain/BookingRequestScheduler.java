@@ -33,7 +33,7 @@ public class BookingRequestScheduler implements IBookingRequestScheduler {
 
 		LOGGER.info("....calculating output ....");
 
-		final Map<LocalDate, SortedSet<IBookingRequest>> meetingsSchedule = new TreeMap<>();
+		final Map<LocalDate, SortedSet<IBookingRequest>> meetingSchedule = new TreeMap<>();
 		if (batch != null) {
 			for (final IBookingRequest booking : batch.getBookingRequests()) {
 				if (isOutsideOfficeHours(booking, batch.getOpeningTime(), batch.getClosingTime())) {
@@ -42,7 +42,7 @@ public class BookingRequestScheduler implements IBookingRequestScheduler {
 
 					final LocalDate meetingDate = booking.getMeetingDate();
 					
-					final boolean meetingAdded = meetingsSchedule.computeIfAbsent(meetingDate, m -> new TreeSet<IBookingRequest>(new ScheduledMeetingComparator())).add(booking);
+					final boolean meetingAdded = meetingSchedule.computeIfAbsent(meetingDate, m -> new TreeSet<IBookingRequest>(new ScheduledMeetingComparator())).add(booking);
 									
 					
 //					SortedSet<IBookingRequest> meetings = meetingsSchedule.get(meetingDate);
@@ -61,7 +61,7 @@ public class BookingRequestScheduler implements IBookingRequestScheduler {
 		// System.out.println("After all that fun we have : " +
 		// meetingsSchedule);
 
-		return meetingsSchedule;
+		return meetingSchedule;
 	}
 
 	/**
