@@ -42,7 +42,7 @@ public class TestBasicCalculatorService {
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest);
         
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.calculate(batch);
+        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
         
         assertEquals(0, output.size());
     }
@@ -61,7 +61,7 @@ public class TestBasicCalculatorService {
         final IBookingRequestScheduler calcService = new BookingRequestScheduler();
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.calculate(batch);
+        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
         assertEquals(0, output.size());
     }
     
@@ -81,7 +81,7 @@ public class TestBasicCalculatorService {
         bookings.add(bookingRequest);
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.calculate(batch);
+        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
         assertEquals(0, output.size());
     }
     
@@ -101,7 +101,7 @@ public class TestBasicCalculatorService {
         bookings.add(bookingRequest);
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.calculate(batch);
+        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
         assertEquals(0, output.size());        
     }
     
@@ -126,7 +126,7 @@ public class TestBasicCalculatorService {
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest1);
         batch.addBookingRequest(bookingRequest2);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.calculate(batch);
+        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
         assertEquals(1, output.size());
        
         final Set<LocalDate> keys = output.keySet();
@@ -167,7 +167,7 @@ public class TestBasicCalculatorService {
         batch.addBookingRequest(bookingRequest1);
         batch.addBookingRequest(bookingRequest2);
         
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.calculate(batch);
+        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
         
         assertEquals(1, output.size());
         final Set<Entry<LocalDate, SortedSet<IBookingRequest>>> entries = output.entrySet();
@@ -212,7 +212,7 @@ public class TestBasicCalculatorService {
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest1);
         batch.addBookingRequest(bookingRequest2);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.calculate(batch);
+        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
         
         assertEquals(1, output.size());
         final Set<Entry<LocalDate, SortedSet<IBookingRequest>>> entries = output.entrySet();
@@ -262,7 +262,7 @@ public class TestBasicCalculatorService {
         batch.addBookingRequest(bookingRequest5);
         
         
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.calculate(batch);        
+        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);        
         assertEquals(2, output.size());
         
         final SortedSet<IBookingRequest> day1Requests = output.get(LocalDate.of(2011, 3, 21));

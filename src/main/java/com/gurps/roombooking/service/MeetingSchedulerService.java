@@ -66,7 +66,7 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
        LOGGER.info("Scheduling...");
         try {
             final IBookingRequestBatch batch = this.readInputFile();
-            final Map<LocalDate, SortedSet<IBookingRequest>> output = bookingRequestScheduler.calculate(batch);
+            final Map<LocalDate, SortedSet<IBookingRequest>> output = bookingRequestScheduler.schedule(batch);
             print(output); //print the output
         } catch (final IOException e) {
         	LOGGER.error("Error processing schedule ", e);

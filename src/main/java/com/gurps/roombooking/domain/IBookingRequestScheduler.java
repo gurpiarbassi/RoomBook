@@ -8,5 +8,5 @@ public interface IBookingRequestScheduler {
     
     static final String OUT_FILE_DELIM = " ";
 
-    Map<LocalDate, SortedSet<IBookingRequest>> calculate(final IBookingRequestBatch batch);
+    Map<LocalDate, SortedSet<IBookingRequest>> schedule(final IBookingRequestBatch batch);
 }

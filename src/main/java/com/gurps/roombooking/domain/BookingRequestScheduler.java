@@ -29,7 +29,7 @@ public class BookingRequestScheduler implements IBookingRequestScheduler {
 	 * e.g. if a meeting clashes with another one then the one that was submitted first takes precedence.
 	 */
 	@Override
-	public Map<LocalDate, SortedSet<IBookingRequest>> calculate(final IBookingRequestBatch batch) {
+	public Map<LocalDate, SortedSet<IBookingRequest>> schedule(final IBookingRequestBatch batch) {
 
 		LOGGER.info("....calculating output ....");
 
@@ -37,18 +37,22 @@ public class BookingRequestScheduler implements IBookingRequestScheduler {
 		if (batch != null) {
 			for (final IBookingRequest booking : batch.getBookingRequests()) {
 				if (isOutsideOfficeHours(booking, batch.getOpeningTime(), batch.getClosingTime())) {
-					System.out.println("Meeting occurs outside office hours. Req =  " + booking.getRequestDate() + " " + booking.getRequestTime());
+					LOGGER.error("Meeting occurs outside office hours. Req =  {} {}",  booking.getRequestDate(), booking.getRequestTime());
 				} else {
 
 					final LocalDate meetingDate = booking.getMeetingDate();
-					SortedSet<IBookingRequest> meetings = meetingsSchedule.get(meetingDate);
-					if (meetings == null) {
-						meetings = new TreeSet<IBookingRequest>(new ScheduledMeetingComparator());
-						meetingsSchedule.put(meetingDate, meetings);
-					}
+					
+					final boolean meetingAdded = meetingsSchedule.computeIfAbsent(meetingDate, m -> new TreeSet<IBookingRequest>(new ScheduledMeetingComparator())).add(booking);
+									
+					
+//					SortedSet<IBookingRequest> meetings = meetingsSchedule.get(meetingDate);
+//					if (meetings == null) {
+//						meetings = new TreeSet<IBookingRequest>(new ScheduledMeetingComparator());
+//						meetingsSchedule.put(meetingDate, meetings);
+//					}
 
-					if (!meetings.add(booking)) {
-						LOGGER.warn("Conflicting booking found for " + booking.getRequestDate() + " " + booking.getRequestTime());
+					if (!meetingAdded) {
+						LOGGER.warn("Conflicting booking found for {} {}", booking.getRequestDate(), booking.getRequestTime());
 					}
 				}
 			}
