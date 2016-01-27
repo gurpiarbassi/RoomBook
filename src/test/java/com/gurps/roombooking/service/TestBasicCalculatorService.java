@@ -4,11 +4,10 @@ import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.junit.Test;
 
@@ -27,84 +26,6 @@ import com.gurps.roombooking.domain.IBookingRequestScheduler;
  */
 public class TestBasicCalculatorService {
 
-    @Test
-    public void testBookingStartBeforeOfficeHours() {
-        final BookingRequest bookingRequest 
-            = makeBookingRequest(LocalDate.of(2014, 3, 8), LocalTime.of(13, 1, 1),
-                LocalDate.of(2014, 3, 8),
-                LocalTime.of(8, 0),
-                2,
-                "EMP01");
-        
-        //TODO factory for service classes or DI.
-        
-        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
-        final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
-        batch.addBookingRequest(bookingRequest);
-        
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
-        
-        assertEquals(0, output.size());
-    }
-    
-    @Test
-    public void testBookingStartAfterOfficeHours() {
-        final BookingRequest bookingRequest 
-        = makeBookingRequest(LocalDate.of(2014, 3, 8), LocalTime.of(13, 1, 1),
-            LocalDate.of(2014, 8, 8),
-            LocalTime.of(18, 0),
-            2,
-            "EMP01");
-        
-        //TODO factory for service classes or DI.
-        
-        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
-        final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
-        batch.addBookingRequest(bookingRequest);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
-        assertEquals(0, output.size());
-    }
-    
-    @Test
-    public void testBookingEndAfterOfficeHours() {
-        final BookingRequest bookingRequest 
-            = makeBookingRequest(LocalDate.of(2014, 3, 8), LocalTime.of(13, 1, 1),
-                LocalDate.of(2014, 8, 8),
-                LocalTime.of(16, 0),
-                5,
-                "EMP01");
-        
-        //TODO factory for service classes or DI.
-        
-        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
-        final Set<BookingRequest> bookings = new TreeSet<>();
-        bookings.add(bookingRequest);
-        final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
-        batch.addBookingRequest(bookingRequest);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
-        assertEquals(0, output.size());
-    }
-    
-    @Test
-    public void testBookingEndBeforeOfficeHours() {
-        final BookingRequest bookingRequest
-        = makeBookingRequest(LocalDate.of(2014, 3, 8), LocalTime.of(13, 1, 1),
-                LocalDate.of(2014, 8, 8),
-                LocalTime.of(14, 0),
-                11,
-                "EMP01");
-        
-        //TODO factory for service classes or DI.
-        
-        final IBookingRequestScheduler calcService = new BookingRequestScheduler();
-        final Set<BookingRequest> bookings = new TreeSet<>();
-        bookings.add(bookingRequest);
-        final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
-        batch.addBookingRequest(bookingRequest);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
-        assertEquals(0, output.size());        
-    }
-    
     @Test
     public void testOverlappingBooking(){
         final BookingRequest bookingRequest1
@@ -126,13 +47,13 @@ public class TestBasicCalculatorService {
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest1);
         batch.addBookingRequest(bookingRequest2);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
+        final Map<LocalDate, List<IBookingRequest>> output = calcService.schedule(batch);
         assertEquals(1, output.size());
        
         final Set<LocalDate> keys = output.keySet();
         final LocalDate meetingDate = keys.iterator().next();
         assertEquals(LocalDate.of(2014, 3, 8), meetingDate);
-        final Set<IBookingRequest> bookingRequest = output.get(meetingDate);
+        final List<IBookingRequest> bookingRequest = output.get(meetingDate);
         assertEquals(1, bookingRequest.size());
         
         final IBookingRequest booking = bookingRequest.iterator().next();
@@ -167,18 +88,18 @@ public class TestBasicCalculatorService {
         batch.addBookingRequest(bookingRequest1);
         batch.addBookingRequest(bookingRequest2);
         
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
+        final Map<LocalDate, List<IBookingRequest>> output = calcService.schedule(batch);
         
         assertEquals(1, output.size());
-        final Set<Entry<LocalDate, SortedSet<IBookingRequest>>> entries = output.entrySet();
-        final Entry<LocalDate, SortedSet<IBookingRequest>> entry = entries.iterator().next();
+        final Set<Entry<LocalDate, List<IBookingRequest>>> entries = output.entrySet();
+        final Entry<LocalDate, List<IBookingRequest>> entry = entries.iterator().next();
         final LocalDate meetingDate = entry.getKey();
         assertEquals(LocalDate.of(2014, 3, 8), meetingDate);
-        final SortedSet<IBookingRequest> bookingRequests = entry.getValue();
+        final List<IBookingRequest> bookingRequests = entry.getValue();
         assertEquals(2, bookingRequests.size());
         
-        final IBookingRequest first = bookingRequests.first();
-        final IBookingRequest second = bookingRequests.last();
+        final IBookingRequest first = bookingRequests.get(bookingRequests.size());
+        final IBookingRequest second = bookingRequests.get(bookingRequests.size() - 1);
         
         assertEquals("EMP01", first.getEmployeeId());
         assertEquals(Integer.valueOf(1), first.getMeetingDuration());
@@ -212,17 +133,17 @@ public class TestBasicCalculatorService {
         final BookingRequestBatch batch = new BookingRequestBatch(LocalTime.of(9, 0), LocalTime.of(17, 0));
         batch.addBookingRequest(bookingRequest1);
         batch.addBookingRequest(bookingRequest2);
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);
+        final Map<LocalDate, List<IBookingRequest>> output = calcService.schedule(batch);
         
         assertEquals(1, output.size());
-        final Set<Entry<LocalDate, SortedSet<IBookingRequest>>> entries = output.entrySet();
-        final Entry<LocalDate, SortedSet<IBookingRequest>> entry = entries.iterator().next();
+        final Set<Entry<LocalDate, List<IBookingRequest>>> entries = output.entrySet();
+        final Entry<LocalDate, List<IBookingRequest>> entry = entries.iterator().next();
         final LocalDate meetingDate = entry.getKey();
         assertEquals(LocalDate.of(2014, 3, 8), meetingDate);
-        final SortedSet<IBookingRequest> bookingRequests = entry.getValue();
+        final List<IBookingRequest> bookingRequests = entry.getValue();
         assertEquals(1, bookingRequests.size());
         
-        final IBookingRequest bookingRequest = bookingRequests.first();
+        final IBookingRequest bookingRequest = bookingRequests.get(0);
         
         assertEquals("EMP02", bookingRequest.getEmployeeId());
         assertEquals(Integer.valueOf(1), bookingRequest.getMeetingDuration());
@@ -262,10 +183,10 @@ public class TestBasicCalculatorService {
         batch.addBookingRequest(bookingRequest5);
         
         
-        final Map<LocalDate, SortedSet<IBookingRequest>> output = calcService.schedule(batch);        
+        final Map<LocalDate, List<IBookingRequest>> output = calcService.schedule(batch);        
         assertEquals(2, output.size());
         
-        final SortedSet<IBookingRequest> day1Requests = output.get(LocalDate.of(2011, 3, 21));
+        final List<IBookingRequest> day1Requests = output.get(LocalDate.of(2011, 3, 21));
         assertEquals(1, day1Requests.size());
         
         final IBookingRequest day1Request = day1Requests.iterator().next();
@@ -274,11 +195,11 @@ public class TestBasicCalculatorService {
         assertEquals(LocalTime.of(9, 0), day1Request.getMeetingStartTime());
         assertEquals(LocalTime.of(11, 0), day1Request.getMeetingEndDateTime().toLocalTime());
         
-        final SortedSet<IBookingRequest> day2Requests = output.get(LocalDate.of(2011, 3, 22));
+        final List<IBookingRequest> day2Requests = output.get(LocalDate.of(2011, 3, 22));
         assertEquals(2, day2Requests.size());
         
-        final IBookingRequest day2First = day2Requests.first();
-        final IBookingRequest day2Second = day2Requests.last();
+        final IBookingRequest day2First = day2Requests.get(0);
+        final IBookingRequest day2Second = day2Requests.get(day2Requests.size() - 1);
         
         assertEquals("EMP003", day2First.getEmployeeId());
         assertEquals(Integer.valueOf(2), day2First.getMeetingDuration());

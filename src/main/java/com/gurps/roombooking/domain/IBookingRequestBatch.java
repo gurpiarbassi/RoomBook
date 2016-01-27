@@ -1,7 +1,7 @@
 package com.gurps.roombooking.domain;
 
 import java.time.LocalTime;
-import java.util.Set;
+import java.util.List;
 
 public interface IBookingRequestBatch {
 
@@ -9,7 +9,7 @@ public interface IBookingRequestBatch {
 
 	LocalTime getClosingTime();
 
-	Set<IBookingRequest> getBookingRequests();
+	List<IBookingRequest> getBookingRequests();
 
 	boolean addBookingRequest(final IBookingRequest bookingRequest);
 }

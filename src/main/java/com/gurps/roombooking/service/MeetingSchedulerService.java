@@ -7,11 +7,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.SortedSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,9 +66,9 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
        LOGGER.info("Scheduling...");
         try {
             final IBookingRequestBatch batch = this.readInputFile();
-            final Map<LocalDate, SortedSet<IBookingRequest>> output = bookingRequestScheduler.schedule(batch);
+            final Map<LocalDate, List<IBookingRequest>> output = bookingRequestScheduler.schedule(batch);
             print(output); //print the output
-        } catch (final IOException e) {
+        } catch (final Exception e) {
         	LOGGER.error("Error processing schedule ", e);
             try {
                 this.writeError();
@@ -181,12 +181,12 @@ public class MeetingSchedulerService implements IMeetingSchedulerService {
      * @Param bookings All the successful booking requests
      * Formats the bookings and prints to a file. 
      */
-    public void print(final Map<LocalDate, SortedSet<IBookingRequest>> bookings) throws IOException {
+    public void print(final Map<LocalDate, List<IBookingRequest>> bookings) throws IOException {
         final StringBuilder outputBuilder = new StringBuilder();
-        final Set<Entry<LocalDate, SortedSet<IBookingRequest>>> entries = bookings.entrySet();
-        final Iterator<Entry<LocalDate, SortedSet<IBookingRequest>>> meetingDaysIterator = entries.iterator();
+        final Set<Entry<LocalDate, List<IBookingRequest>>> entries = bookings.entrySet();
+        final Iterator<Entry<LocalDate, List<IBookingRequest>>> meetingDaysIterator = entries.iterator();
         while(meetingDaysIterator.hasNext()){
-            final Entry<LocalDate, SortedSet<IBookingRequest>> entry = meetingDaysIterator.next();
+            final Entry<LocalDate, List<IBookingRequest>> entry = meetingDaysIterator.next();
             final LocalDate meetingDate = entry.getKey();
             outputBuilder.append(meetingDate.toString() + System.getProperty("line.separator"));
             

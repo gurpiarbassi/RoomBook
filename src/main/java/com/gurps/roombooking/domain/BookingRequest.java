@@ -12,9 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
-import org.apache.commons.lang3.builder.CompareToBuilder;
-
-public class BookingRequest implements Comparable<BookingRequest>, IBookingRequest {
+public class BookingRequest implements IBookingRequest {
 
 	private final LocalDate requestDate;
 	private final LocalTime requestTime;
@@ -84,32 +82,12 @@ public class BookingRequest implements Comparable<BookingRequest>, IBookingReque
 	public int hashCode() {
 		return reflectionHashCode(this);
 	}
-
+	
 	@Override
 	public String toString() {
 		return reflectionToString(this, MULTI_LINE_STYLE);
 	}
-
 	
-	/**
-	 * Constraint: 'Bookings must be processed in the chronological order in which they were submitted'.
-	 * Default to ordering the bookings by request submission date/time
-	 * @param that BookingRequest to compare.
-	 * @return 
-	 *  0 if the booking requests were submitted at the same time (Although business rules guarantee this wont happen)
-	 *  1 if this booking request was submitted after that booking request
-	 *  -1 if this booking request was submitted before that booking request
-	 * 
-	 */
-	@Override
-	public int compareTo(final BookingRequest that) {
-		return compareByRequestDateTime(that);
-	}
-
-	private int compareByRequestDateTime(final BookingRequest that) {
-		return new CompareToBuilder().append(this.getRequestDate(), that.getRequestDate()).append(this.getRequestTime(), that.getRequestTime()).toComparison();
-	}
-
 	/**
 	 * Builder class to allow construction of a immutable BookingRequest and
 	 * avoid telescoping constructor.
